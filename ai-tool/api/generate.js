@@ -50,24 +50,33 @@ Do NOT add text outside JSON.
     const data = await response.json();
 
     const raw =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-    let parsed;
+// extract only JSON
+const start = raw.indexOf("{");
+const end = raw.lastIndexOf("}");
 
-    try {
-      const clean = raw
-  .replace(/```json/g, "")
-  .replace(/```/g, "")
-  .trim();
+if (start === -1 || end === -1) {
+  return res.status(500).json({
+    error: "No JSON found",
+    raw,
+  });
+}
 
-parsed = JSON.parse(clean);
-    } catch (e) {
-      return res.status(500).json({
-        error: "Invalid JSON from AI",
-        raw,
-      });
-    }
+const jsonString = raw.substring(start, end + 1);
 
+let parsed;
+
+try {
+  parsed = JSON.parse(jsonString);
+} catch (e) {
+  return res.status(500).json({
+    error: "Still invalid JSON",
+    raw,
+  });
+}
+
+return res.status(200).json(parsed);
     return res.status(200).json(parsed);
   } catch (err) {
     return res.status(500).json({
