@@ -9,24 +9,25 @@ export default async function handler(req, res) {
     }
 
     const prompt = `
-You are a social media expert.
+You are an AI that ONLY returns valid JSON.
 
-Create viral content for this video.
+Create viral social media content.
 
 Title: ${title}
 Description: ${desc}
 Duration: ${duration}
 Niche: ${niche}
 
-Return STRICT JSON format like this:
+Return ONLY JSON in this format:
 
 {
   "hooks": ["hook1", "hook2", "hook3"],
   "captions": ["caption1", "caption2"],
-  "hashtags": ["#tag1", "#tag2", "#tag3"]
+  "hashtags": ["#tag1", "#tag2"]
 }
 
-Only return JSON. No extra text.
+Do NOT add any explanation.
+Do NOT add text outside JSON.
 `;
 
     const response = await fetch(
