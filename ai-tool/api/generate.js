@@ -9,18 +9,25 @@ export default async function handler(req, res) {
     }
 
     const prompt = `
-    Create viral social media content.
+You are a social media expert.
 
-    Title: ${title}
-    Description: ${desc}
-    Duration: ${duration}
-    Niche: ${niche}
+Create viral content for this video.
 
-    Generate:
-    - Hooks
-    - Captions
-    - Hashtags
-    `;
+Title: ${title}
+Description: ${desc}
+Duration: ${duration}
+Niche: ${niche}
+
+Return STRICT JSON format like this:
+
+{
+  "hooks": ["hook1", "hook2", "hook3"],
+  "captions": ["caption1", "caption2"],
+  "hashtags": ["#tag1", "#tag2", "#tag3"]
+}
+
+Only return JSON. No extra text.
+`;
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${process.env.GEMINI_API_KEY}`,
@@ -41,10 +48,21 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    const text =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
+    const raw =
+      data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-    return res.status(200).json({ result: text });
+    let parsed;
+
+    try {
+      parsed = JSON.parse(raw);
+    } catch (e) {
+      return res.status(500).json({
+        error: "Invalid JSON from AI",
+        raw,
+      });
+    }
+
+    return res.status(200).json(parsed);
   } catch (err) {
     return res.status(500).json({
       error: "Something went wrong",
