@@ -55,7 +55,12 @@ Do NOT add text outside JSON.
     let parsed;
 
     try {
-      parsed = JSON.parse(raw);
+      const clean = raw
+  .replace(/```json/g, "")
+  .replace(/```/g, "")
+  .trim();
+
+parsed = JSON.parse(clean);
     } catch (e) {
       return res.status(500).json({
         error: "Invalid JSON from AI",
