@@ -76,8 +76,16 @@ try {
   });
 }
 
-return res.status(200).json(parsed);
-    return res.status(200).json(parsed);
+return res.status(200).json({
+  hooks: [raw],
+  captions: [],
+  hashtags: []
+});
+    return res.status(200).json({
+  hooks: [raw],
+  captions: [],
+  hashtags: []
+});
   } catch (err) {
     return res.status(500).json({
       error: "Something went wrong",
