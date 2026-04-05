@@ -17,9 +17,9 @@ Duration: ${duration}
 Niche: ${niche}
 
 Give:
-- Hooks
-- Captions
-- Hashtags
+- 3 Hooks
+- 2 Captions
+- 5 Hashtags
 `;
 
     const response = await fetch(
@@ -42,12 +42,30 @@ Give:
     const data = await response.json();
 
     const raw =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "No content generated";
+      data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-    // 🔥 NO JSON PARSING — DIRECT OUTPUT
+    // 🔥 SIMPLE PARSING (NO STRICT JSON)
+    const hooks = raw.match(/(?:\d+\.|-)\s*(.*hook.*)/gi) || [
+      title || "Must watch this!",
+      "Don't miss this!",
+      "Viral content alert!"
+    ];
+
+    const captions = raw.match(/(?:caption[:\-]?)(.*)/gi) || [
+      desc || "Check this out!",
+      "This is amazing!"
+    ];
+
+    const hashtags = raw.match(/#\w+/g) || [
+      "#viral",
+      "#trending",
+      "#fyp"
+    ];
+
     return res.status(200).json({
-      result: raw,
+      hooks,
+      captions,
+      hashtags,
     });
 
   } catch (err) {
